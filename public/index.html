@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="/socket.io/socket.io.js"></script>
+  <script defer src="chat.js"></script>
+  <title>Chat app</title>
+</head>
+<body>
+  <h1>Chat Appi</h1>
+
+  <!-- Nickname -->
+  <label for="nickname">Nickname:</label>
+  <input type="text" id="nickname" placeholder="Enter your nickname" required />
+
+  <!-- Room selection -->
+  <label for="room">Choose a room:</label>
+  <select id="room">
+    <option value="general">General</option>
+    <option value="sports">Sport</option>
+    <option value="tech">Tech</option>
+    <option value="music">Music</option>
+  </select>
+  <button id="joinRoomBtn">Join Room</button>
+
+  <hr>
+
+  <!-- Chat area -->
+  <ul id="messages"></ul>
+
+  <!-- Message input -->
+  <form id="chatForm">
+    <input type="text" id="m" placeholder="Type a message" autocomplete="off" required />
+    <button type="submit">Send</button>
+  </form>
+  <!-- file uploads placeholder -->
+  <div>
+    <button id="sendImageBtn">upload Image</button>
+    <input type="file" id="imageInput" accept="image/*" hidden/>
+
+    <button id="sendAudioBtn">Upload Audio</button>
+    <input type="file" id="audioInput" accept="audio/*" hidden/>
+
+  </div>
+</body>
+</html>
