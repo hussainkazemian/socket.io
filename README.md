@@ -67,3 +67,8 @@ socket.emit('join room', 'general');
 
 ![upload](src/images/room.png)
 
+## Run locally
+
+```
+node index.js
+```
