@@ -10,38 +10,44 @@ app.use(express.static('public'));
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
-  // Handle room joining
+  // Join room
   socket.on('join room', ({ room, nickname }) => {
     socket.join(room);
     socket.room = room;
     socket.nickname = nickname;
     console.log(`${nickname} joined room: ${room}`);
-
     io.to(room).emit('system message', `${nickname} joined the room.`);
   });
 
-  // Handle chat message
+  // Leave room
+  socket.on('leave room', ({ room, nickname }) => {
+    socket.leave(room);
+    console.log(`${nickname} left room: ${room}`);
+    io.to(room).emit('system message', `${nickname} left the room.`);
+  });
+
+  // Chat message
   socket.on('chat message', ({ room, nickname, message }) => {
     console.log(`[${room}] ${nickname}: ${message}`);
     io.to(room).emit('chat message', { nickname, message });
   });
-  
- // Handle image uploads (placeholder)
-socket.on('image message', ({ room, nickname, fileName }) => {
-  console.log(`[${room}] ${nickname} is sending an image: ${fileName}`);
-  io.to(room).emit('system message', `${nickname} is sending an image: ${fileName}`);
-});
 
-// Handle audio uploads (placeholder)
-socket.on('audio message', ({ room, nickname, fileName }) => {
-  console.log(`[${room}] ${nickname} is sending an audio file: ${fileName}`);
-  io.to(room).emit('system message', `${nickname} is sending an audio file: ${fileName}`);
-});
+  // Image message
+  socket.on('image message', ({ room, nickname, fileName }) => {
+    console.log(`[${room}] ${nickname} is sending an image: ${fileName}`);
+    io.to(room).emit('system message', `${nickname} is sending an image: ${fileName}`);
+  });
 
-  // Handle disconnect
+  // Audio message
+  socket.on('audio message', ({ room, nickname, fileName }) => {
+    console.log(`[${room}] ${nickname} is sending an audio file: ${fileName}`);
+    io.to(room).emit('system message', `${nickname} is sending an audio file: ${fileName}`);
+  });
+
+  // Disconnect
   socket.on('disconnect', () => {
     if (socket.room && socket.nickname) {
-      io.to(socket.room).emit('system message', `${socket.nickname} left the room.`);
+      io.to(socket.room).emit('system message', `${socket.nickname} disconnected.`);
     }
     console.log('User disconnected:', socket.id);
   });

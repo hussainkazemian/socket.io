@@ -1,5 +1,4 @@
 'use strict';
-
 const socket = io('http://localhost:3000');
 
 // DOM elements
@@ -14,94 +13,79 @@ const imageInput = document.getElementById('imageInput');
 const sendAudioBtn = document.getElementById('sendAudioBtn');
 const audioInput = document.getElementById('audioInput');
 
-let currentRoom = 'general'; // default room
+let currentRoom = 'general';
+let previousRoom = null;
 let nickname = 'Anonymous';
 
-// Join room when button clicked
+// Join room with proper leave notification
 joinRoomBtn.addEventListener('click', () => {
   nickname = nicknameInput.value.trim() || 'Anonymous';
-  currentRoom = roomSelect.value;
+  const newRoom = roomSelect.value;
+
+  if (previousRoom) {
+    socket.emit('leave room', { room: previousRoom, nickname });
+  }
+
+  currentRoom = newRoom;
+  previousRoom = currentRoom;
+
   socket.emit('join room', { room: currentRoom, nickname });
-  messagesList.innerHTML = ''; // clear chat history when switching rooms
+  messagesList.innerHTML = ''; // clear messages
 });
 
-// Send message
+// Send text message
 form.addEventListener('submit', (event) => {
   event.preventDefault();
   const msg = messageInput.value.trim();
   if (!msg) return;
-  socket.emit('chat message', {
-    room: currentRoom,
-    nickname,
-    message: msg,
-  });
+  socket.emit('chat message', { room: currentRoom, nickname, message: msg });
   messageInput.value = '';
 });
 
-// Receive message
+// Receive chat message
 socket.on('chat message', (data) => {
   const item = document.createElement('li');
-  item.innerHTML = `<strong>${data.nickname}</strong> says: ${data.message}`;
+  item.classList.add('message');
+  item.innerHTML = `<div class="bubble"><strong>${data.nickname}</strong>: ${data.message}</div>`;
   messagesList.appendChild(item);
+  messagesList.scrollTop = messagesList.scrollHeight;
 });
 
-// System messages (join/leave notifications)
+// System messages
 socket.on('system message', (msg) => {
   const item = document.createElement('li');
-  item.style.fontStyle = 'italic';
+  item.classList.add('system-message');
   item.innerText = msg;
   messagesList.appendChild(item);
+  messagesList.scrollTop = messagesList.scrollHeight;
 });
 
-// trigger hidden file input for image upload
-sendImageBtn.addEventListener('click', () => {
-  imageInput.click();
-});
-
-//show placehodler when image selected
-
+// Image upload
+sendImageBtn.addEventListener('click', () => imageInput.click());
 imageInput.addEventListener('change', () => {
   if (imageInput.files.length > 0) {
     const fileName = imageInput.files[0].name;
-
-    //upload UI
     const item = document.createElement('li');
-    item.innerHTML = `<strong>${nickname}</strong> is sending an image: [${fileName}]`;
+    item.classList.add('message');
+    item.innerHTML = `<div class="bubble"><strong>${nickname}</strong> is sending an image: [${fileName}]</div>`;
     messagesList.appendChild(item);
-
-    //Emit event to server
-    socket.emit('image message', {
-        room: currentRoom,
-        nickname,
-        fileName
-    });
-    imageInput.value = ''; // reset
+    socket.emit('image message', { room: currentRoom, nickname, fileName });
+    messagesList.scrollTop = messagesList.scrollHeight;
+    imageInput.value = '';
   }
-});    
-
-// trigger hidden file input for audio upload
-sendAudioBtn.addEventListener('click', () => {
-  audioInput.click();
 });
 
-// Show placeholder when audio selected
+// Audio upload
+sendAudioBtn.addEventListener('click', () => audioInput.click());
 audioInput.addEventListener('change', () => {
   if (audioInput.files.length > 0) {
     const fileName = audioInput.files[0].name;
-
-    //upload UI
-
     const item = document.createElement('li');
-    item.innerHTML = `<strong>${nickname}</strong> is sending an audio file: [${fileName}]`;
+    item.classList.add('message');
+    item.innerHTML = `<div class="bubble"><strong>${nickname}</strong> is sending an audio file: [${fileName}]</div>`;
     messagesList.appendChild(item);
-
-    // Emit event to server
-    socket.emit('audio message', {
-        room: currentRoom,
-        nickname,
-        fileName
-    });
-
-    audioInput.value = ''; // reset
+    socket.emit('audio message', { room: currentRoom, nickname, fileName });
+    messagesList.scrollTop = messagesList.scrollHeight;
+    audioInput.value = '';
   }
 });
