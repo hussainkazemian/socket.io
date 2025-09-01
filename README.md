@@ -59,6 +59,11 @@ chatNamespace.on('connection', (socket) => {
 socket.emit('join room', 'general');
 ```
 
-![A user created and join to a room](public/images/nickname.png)
-
-![User can upload image and audio](public/images/room.png)
+## A user created and join to a room
+```
+![](./public/images/nickname.png)
+```
+## User can upload image and audio
+```
+![](src/images/room.png)
+```
