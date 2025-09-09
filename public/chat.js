@@ -1,5 +1,7 @@
 'use strict';
-const socket = io('http://localhost:3000');
+
+// Connect to Socket.IO on the same host (works locally and on Render)
+const socket = io();
 
 // DOM elements
 const form = document.getElementById('chatForm');
